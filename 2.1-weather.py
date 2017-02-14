@@ -38,45 +38,51 @@ def get_date_list(start, end, toFormat):
         date = date + datetime.timedelta(1)
     return date_list
 
+def judge_weather_good_or_not():
+    fr = open('weather_good_or_not.txt')
+    content = fr.readlines()
+    fr.close()
+    weather_good_or_not = []
+    for i in content:
+        i = i.strip()
+        weather = []
+        weather.append(i[0])
+        weather.append(i[1])
+        weather.append(i[2:])
+        weather_good_or_not.append(weather)
+    return pd.DataFrame(weather_good_or_not,columns=['early_weather','late_weather','weather'])
 
-df = pd.DataFrame(get_weather_list(),columns=['city','date','high','low','weather','wind','windlevel'],dtype=float)
-df = df[df['date'].isin(get_date_list('2015-07-01','2016-11-14','%Y-%m-%d'))]
-df['high2'] = np.power(df['high'],2)
-df['low2'] = np.power(df['low'],2)
+if __name__ == '__main__':
 
-fr = open('weather_good_or_not.txt')
-content = fr.readlines()
-weather_good_or_not = []
-for i in content:
-    i = i.strip()
-    weather = []
-    weather.append(i[0])
-    weather.append(i[1])
-    weather.append(i[2:])
-    weather_good_or_not.append(weather)
-weather_good_or_not = pd.DataFrame(weather_good_or_not,columns=['first','second','weather'])
-
-df = df.join(weather_good_or_not.set_index('weather'), on='weather')
-del df['wind']
-del df['windlevel']
-del df['weather']
-
-df = df.fillna(0)
-print df
-df.to_csv('weather_info.txt', header=None, index=False)
+    df = pd.DataFrame(get_weather_list(),columns=['city','date','high','low','weather','wind','windlevel'],dtype=float)
+    df = df[df['date'].isin(get_date_list('2015-07-01','2016-11-14','%Y-%m-%d'))]#截取需要的天气数据
+    df['high2'] = np.power(df['high'],2)
+    df['low2'] = np.power(df['low'],2)
 
 
-# ##检查天气数据是否完整
-# title = ['shop_id','city_name','location_id','per_pay','score','comment_cnt',
-#          'shop_level','category_1','category_2','category_3']
-# shop_info = pd.read_csv('shop_info.txt', header=None, names=title)
-# city_list = shop_info['city_name'].values
-# day_list = get_date_list('2015-07-01','2016-10-31','%Y-%m-%d')
-# weather_info = pd.read_csv('weather_info.txt',header=None)
-# weather_info.fillna(0)
-# for city in set(city_list):
-#     try:
-#         print weather_info[(weather_info[0]==city)&(weather_info[1]=='2016-06-22')].values[0][2:]
-#     except:
-#         print city
+    weather_good_or_not = judge_weather_good_or_not()
+    df = df.join(weather_good_or_not.set_index('weather'), on='weather')
+
+    df.drop(['wind'],axis=1,inplace=True)
+    df.drop(['windlevel'],axis=1,inplace=True)
+    df.drop(['weather'],axis=1,inplace=True)
+
+    df = df.fillna(0)
+    print df
+    df.to_csv('weather_info.txt', header=None, index=False)
+
+
+    # ##检查天气数据是否完整
+    # title = ['shop_id','city_name','location_id','per_pay','score','comment_cnt',
+    #          'shop_level','category_1','category_2','category_3']
+    # shop_info = pd.read_csv('shop_info.txt', header=None, names=title)
+    # city_list = shop_info['city_name'].values
+    # day_list = get_date_list('2015-07-01','2016-10-31','%Y-%m-%d')
+    # weather_info = pd.read_csv('weather_info.txt',header=None)
+    # weather_info.fillna(0)
+    # for city in set(city_list):
+    #     try:
+    #         print weather_info[(weather_info[0]==city)&(weather_info[1]=='2016-06-22')].values[0][2:]
+    #     except:
+    #         print city
 

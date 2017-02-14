@@ -52,6 +52,5 @@ def get_shop_pay_count():
 if __name__ == '__main__':
 
     #把统计数据写入本地
-
     shop_pay_count = get_shop_pay_count()
-    pd.DataFrame(shop_pay_count).to_csv('shop_pay_count.csv')#注意shop_id的编号，并没有按1,2,3...排列，而是1,10,100,1000,10001...
+    pd.DataFrame(shop_pay_count).to_csv('shop_pay_count.csv')#注意shop_id的编号排列,并没有按(int)1,2,3...排列,而是(str)1,10,100,1000,10001...
