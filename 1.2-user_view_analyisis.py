@@ -37,7 +37,7 @@ def get_shop_view_dict():
             shop_view_dict[shop_id][date] = 0
     return shop_view_dict
 
-####初始化{商家:{日期:支付数}} (只能一行一行地统计,因为内存不够)
+####统计{商家:{日期:支付数}} (只能一行一行地统计,因为内存不够)
 def get_shop_view_count():
     days_list = get_date_list('2015-07-01','2016-10-31')
     shop_view_count = get_shop_view_dict()
