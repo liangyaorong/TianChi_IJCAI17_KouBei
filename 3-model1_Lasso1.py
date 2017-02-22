@@ -2,13 +2,14 @@
 
 from sklearn import linear_model
 from tool import *
-####提取时间特征(day_info包括了test_day14天)
+
+##提取时间特征(day_info包括了test_day14天)
 days_info = pd.read_csv('days_info.txt', header=None, index_col=False,names=['weekdays','holiday'])
 days_info = pd.concat([pd.get_dummies(days_info['weekdays']), pd.get_dummies(days_info['holiday'])],axis=1)
 
 pay_count = pd.read_csv('shop_pay_count.csv')
 
-####模型出答案
+##模型出答案
 weeks_before = 3
 answer = np.zeros([2000,15])
 for shop_id in range(1,2001):
