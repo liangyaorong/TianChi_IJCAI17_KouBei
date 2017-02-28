@@ -56,7 +56,6 @@ def plot_two_answers(old_pred_file_name, new_pred_file_name, shop_id):
     plt.show()
 
 def plot_shop_count(filename, shop_id, show=True):
-    from matplotlib import pyplot as plt
     pay_count = pd.read_csv(filename)
     shop_pay = pay_count[str(shop_id)]
     shop_pay.index = get_date_list('2015-07-01','2016-10-31', '%Y-%m-%d')
@@ -94,3 +93,9 @@ def cheak_answer_is_nonegative(ans_filename):
     pred_file_name = ans_filename
     new_pred = pd.read_csv(pred_file_name, header=None, index_col=False)
     print (new_pred > 0).all().all()
+
+def judge_cycle(shop_count, corr_baseline):
+    shop_weekly_count = pd.DataFrame(shop_count[6:].values.reshape(-1, 7))
+    train_weekly_count = shop_weekly_count[-3:]
+    week_corr =  train_weekly_count.T.corr()
+    return (np.abs(week_corr)>corr_baseline).all().all()
