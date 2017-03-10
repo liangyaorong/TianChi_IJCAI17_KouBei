@@ -51,6 +51,7 @@ def plot_two_answers(old_pred_file_name, new_pred_file_name, shop_id):
 
     new_all = np.concatenate([shop_pay,new_pred])
     old_all = np.concatenate([shop_pay,old_pred])
+    plt.figure(shop_id)
     plt.plot(range(len(new_all)),new_all,'--')
     plt.plot(range(len(old_all)),old_all,'green')
     plt.show()
@@ -64,29 +65,24 @@ def plot_shop_count(filename, shop_id, show=True):
         plt.show()
 
 
-'''对某个商家数据进行异常值平滑并用上一周数据填充缺失值
-进出都是array()
+'''对数据进行多项式拟合，使缺失值填充尽可能平滑'''
+def poly_fit(shop_count, n):
+    x = np.linspace(0,1,len(shop_count))
+    cof = np.polyfit(x,shop_count,n)
+    p = np.poly1d(cof)
+    return p(x)
+
+
+'''进出都是array()
 '''
-def clean_data(shop_count, sigma):
+def clean_data(shop_count):
     shop_count = np.asarray(shop_count)
     shop_pay_count = shop_count
-    shop_weekly_pay_count = shop_pay_count[6:].reshape(-1, 7)
-    index = range(64, 69)
-    while index[0] != 0:
-        now_weekly_pay_count = shop_weekly_pay_count[index, :]
-        mean = now_weekly_pay_count.mean(axis=0)
-        std = now_weekly_pay_count.std(axis=0)
-        last_weekly_count = shop_weekly_pay_count[index[0] - 1, :]
-        last_weekly_count[last_weekly_count <= 0] = shop_weekly_pay_count[index[0], :]\
-            [last_weekly_count <= 0]#部分缺失值填充
-        last_weekly_count[last_weekly_count - mean > sigma * std] = shop_weekly_pay_count[index[0], :]\
-            [last_weekly_count - mean > sigma * std]#异常值平滑
-        index = (np.asarray(index) - 1).tolist()
-    shop_weekly_pay_count = pd.DataFrame(shop_weekly_pay_count)
-    all_mean = shop_weekly_pay_count.mean()
-    shop_weekly_pay_count = shop_weekly_pay_count[shop_weekly_pay_count>0].fillna(all_mean)
-    shop_weekly_pay_count = shop_weekly_pay_count.values
-    shop_pay_count[6:] = shop_weekly_pay_count.reshape(1, -1)
+    shop_weekly_pay_count = pd.DataFrame(shop_pay_count[6:].reshape(-1, 7))
+    all_week_mean = shop_weekly_pay_count[shop_weekly_pay_count>0].dropna()[-3:].mean()#周均值
+    shop_weekly_pay_count = shop_weekly_pay_count[shop_weekly_pay_count>0].fillna(all_week_mean)#用均值填充
+    shop_weekly_pay_count = shop_weekly_pay_count.values.reshape(1, -1)[0]
+    shop_pay_count[6:] = shop_weekly_pay_count
     return shop_pay_count
 
 def cheak_answer_is_nonegative(ans_filename):
@@ -99,3 +95,30 @@ def judge_cycle(shop_count, corr_baseline):
     train_weekly_count = shop_weekly_count[-3:]
     week_corr =  train_weekly_count.T.corr()
     return (np.abs(week_corr)>corr_baseline).all().all()
+
+def judge_trend(shop_count):
+    shop_weekly_count = pd.DataFrame(shop_count[6:].values.reshape(-1, 7))
+    train_weekly_count = shop_weekly_count[-3:]
+    mean = train_weekly_count.mean(axis=1).values
+    # print mean
+    if mean[-1] > mean[-2] and mean[-2] > mean[-3]:
+        percent = ((mean[-1]-mean[-2])/mean[-2] + (mean[-2]-mean[-3])/mean[-3])/2
+        return 'accend', percent
+    if mean[-1] < mean[-2] and mean[-2] < mean[-3]:
+        percent = ((mean[-1]-mean[-2])/mean[-2] + (mean[-2]-mean[-3])/mean[-3])/2
+        return 'deccent', percent
+    else:
+        return None
+
+def judge_normal(shop_count):
+    shop_weekly_count = pd.DataFrame(shop_count[6:].values.reshape(-1, 7))
+    train_weekly_count = shop_weekly_count[-6:]
+    mean = train_weekly_count.mean(axis=1)
+    return (mean>30).all()
+
+'''对数据进行多项式拟合，使缺失值填充尽可能平滑'''
+def poly_fit(shop_count, n):
+    x = np.linspace(0,1,len(shop_count))
+    cof = np.polyfit(x,shop_count,n)
+    p = np.poly1d(cof)
+    return p(x)

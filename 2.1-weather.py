@@ -56,9 +56,6 @@ if __name__ == '__main__':
 
     df = pd.DataFrame(get_weather_list(),columns=['city','date','high','low','weather','wind','windlevel'],dtype=float)
     df = df[df['date'].isin(get_date_list('2015-07-01','2016-11-14','%Y-%m-%d'))]#截取需要的天气数据
-    df['high2'] = np.power(df['high'],2)
-    df['low2'] = np.power(df['low'],2)
-
 
     weather_good_or_not = judge_weather_good_or_not()
     df = df.join(weather_good_or_not.set_index('weather'), on='weather')
