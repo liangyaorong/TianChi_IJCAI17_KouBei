@@ -1,5 +1,8 @@
 #coding:utf-8
 
+'''用星期与假期作为特征，Lasso能到0.0847
+'''
+
 from sklearn import linear_model
 from tool import *
 
