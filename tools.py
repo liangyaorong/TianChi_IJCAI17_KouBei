@@ -116,9 +116,3 @@ def judge_normal(shop_count):
     mean = train_weekly_count.mean(axis=1)
     return (mean>30).all()
 
-'''对数据进行多项式拟合，使缺失值填充尽可能平滑'''
-def poly_fit(shop_count, n):
-    x = np.linspace(0,1,len(shop_count))
-    cof = np.polyfit(x,shop_count,n)
-    p = np.poly1d(cof)
-    return p(x)
