@@ -34,7 +34,7 @@
 * stacking在这里也不适用，因为每个模型训练出来的答案高度共线性，stacking出来的结果方差很大，线上提交也显示的效果并不好．要做模型融合的话可以做加权融合，但是没找到明确的分类，因此也没有做．日后学习一下高分答案再补充．<br>
    
 ## 其他大神的做法<br>
-* 获奖解决方案看这里！.[传送门](https://tianchi.aliyun.com/competition/new_articleDetail.html?postsId=2525&from=singlemessage)
+* 获奖解决方案看这里！包括思路和PPT！[传送门](https://tianchi.aliyun.com/competition/new_articleDetail.html?postsId=2525&from=singlemessage)
 * 第十六名的队伍 皮皮虾，我们回去吧 也开源啦，大家快过去围观 [传送门](https://github.com/RogerMonkey/IJCAI_CUP_2017). 预处理方面他们多了一份数据：以四分之一天为单位;模型融合是对几个模型的预测加权回归;规则方面他们对火锅店与双十一进行了单独处理<br>
 * 其他大神的方法暂未开源，因此这里待续。热烈欢迎大家补充<br>
 ### p.s.<br>
